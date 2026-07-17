@@ -1,4 +1,4 @@
-import { supabase } from "@/services/supabase/client";
+import { isSupabaseConfigured, supabase } from "@/services/supabase/client";
 import type { DiaryEntry } from "@/types/entities";
 
 type DiaryEntryRow = {
@@ -38,6 +38,10 @@ function toDiaryError(error: unknown, context: string): Error {
 
 export const DiaryRepository = {
   async getAll(): Promise<DiaryEntry[]> {
+    if (!isSupabaseConfigured || !supabase) {
+      return [];
+    }
+
     const { data, error } = await supabase
       .from("diary_entries")
       .select("id, project_id, title, entry_date, weather, short_note, long_note")
@@ -51,6 +55,10 @@ export const DiaryRepository = {
   },
 
   async getByProjectId(projectId: string): Promise<DiaryEntry[]> {
+    if (!isSupabaseConfigured || !supabase) {
+      return [];
+    }
+
     const { data, error } = await supabase
       .from("diary_entries")
       .select("id, project_id, title, entry_date, weather, short_note, long_note")
@@ -65,6 +73,10 @@ export const DiaryRepository = {
   },
 
   async create(entry: DiaryEntry): Promise<DiaryEntry> {
+    if (!isSupabaseConfigured || !supabase) {
+      throw new Error("Supabase is not configured");
+    }
+
     const payload = {
       project_id: entry.projectId,
       title: entry.title,
@@ -88,6 +100,10 @@ export const DiaryRepository = {
   },
 
   async update(id: string, entry: DiaryEntry): Promise<DiaryEntry> {
+    if (!isSupabaseConfigured || !supabase) {
+      throw new Error("Supabase is not configured");
+    }
+
     const payload = {
       project_id: entry.projectId,
       title: entry.title,
@@ -112,6 +128,10 @@ export const DiaryRepository = {
   },
 
   async remove(id: string): Promise<void> {
+    if (!isSupabaseConfigured || !supabase) {
+      throw new Error("Supabase is not configured");
+    }
+
     const { error } = await supabase.from("diary_entries").delete().eq("id", id);
 
     if (error) {

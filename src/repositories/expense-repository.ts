@@ -1,4 +1,4 @@
-import { supabase } from "@/services/supabase/client";
+import { isSupabaseConfigured, supabase } from "@/services/supabase/client";
 import type { Expense } from "@/types/entities";
 
 type ExpenseRow = {
@@ -40,6 +40,10 @@ function toExpenseError(error: unknown, context: string): Error {
 
 export const ExpenseRepository = {
   async getAll(): Promise<Expense[]> {
+    if (!isSupabaseConfigured || !supabase) {
+      return [];
+    }
+
     const { data, error } = await supabase
       .from("expenses")
       .select("id, project_id, name, amount, expense_date, supplier_name, short_note, long_note")
@@ -53,6 +57,10 @@ export const ExpenseRepository = {
   },
 
   async getByProjectId(projectId: string): Promise<Expense[]> {
+    if (!isSupabaseConfigured || !supabase) {
+      return [];
+    }
+
     const { data, error } = await supabase
       .from("expenses")
       .select("id, project_id, name, amount, expense_date, supplier_name, short_note, long_note")
@@ -67,6 +75,10 @@ export const ExpenseRepository = {
   },
 
   async getById(id: string): Promise<Expense | null> {
+    if (!isSupabaseConfigured || !supabase) {
+      return null;
+    }
+
     const { data, error } = await supabase
       .from("expenses")
       .select("id, project_id, name, amount, expense_date, supplier_name, short_note, long_note")
@@ -81,6 +93,10 @@ export const ExpenseRepository = {
   },
 
   async create(expense: Expense): Promise<Expense> {
+    if (!isSupabaseConfigured || !supabase) {
+      throw new Error("Supabase is not configured");
+    }
+
     const payload = {
       project_id: expense.projectId,
       name: expense.name,
@@ -105,6 +121,10 @@ export const ExpenseRepository = {
   },
 
   async update(id: string, expense: Expense): Promise<Expense> {
+    if (!isSupabaseConfigured || !supabase) {
+      throw new Error("Supabase is not configured");
+    }
+
     const payload = {
       project_id: expense.projectId,
       name: expense.name,
@@ -130,6 +150,10 @@ export const ExpenseRepository = {
   },
 
   async remove(id: string): Promise<void> {
+    if (!isSupabaseConfigured || !supabase) {
+      throw new Error("Supabase is not configured");
+    }
+
     const { error } = await supabase.from("expenses").delete().eq("id", id);
 
     if (error) {

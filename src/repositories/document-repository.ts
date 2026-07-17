@@ -1,4 +1,4 @@
-import { supabase } from "@/services/supabase/client";
+import { isSupabaseConfigured, supabase } from "@/services/supabase/client";
 import type { DocumentItem } from "@/types/entities";
 
 type DocumentRow = {
@@ -38,6 +38,10 @@ function toDocumentError(error: unknown, context: string): Error {
 
 export const DocumentRepository = {
   async getAll(): Promise<DocumentItem[]> {
+    if (!isSupabaseConfigured || !supabase) {
+      return [];
+    }
+
     const { data, error } = await supabase
       .from("documents")
       .select("id, project_id, name, document_type, issue_date, supplier_id, notes")
@@ -51,6 +55,10 @@ export const DocumentRepository = {
   },
 
   async getByProjectId(projectId: string): Promise<DocumentItem[]> {
+    if (!isSupabaseConfigured || !supabase) {
+      return [];
+    }
+
     const { data, error } = await supabase
       .from("documents")
       .select("id, project_id, name, document_type, issue_date, supplier_id, notes")
@@ -65,6 +73,10 @@ export const DocumentRepository = {
   },
 
   async create(document: DocumentItem): Promise<DocumentItem> {
+    if (!isSupabaseConfigured || !supabase) {
+      throw new Error("Supabase is not configured");
+    }
+
     const payload = {
       project_id: document.projectId,
       name: document.name,
@@ -88,6 +100,10 @@ export const DocumentRepository = {
   },
 
   async update(id: string, document: DocumentItem): Promise<DocumentItem> {
+    if (!isSupabaseConfigured || !supabase) {
+      throw new Error("Supabase is not configured");
+    }
+
     const payload = {
       project_id: document.projectId,
       name: document.name,
@@ -112,6 +128,10 @@ export const DocumentRepository = {
   },
 
   async remove(id: string): Promise<void> {
+    if (!isSupabaseConfigured || !supabase) {
+      throw new Error("Supabase is not configured");
+    }
+
     const { error } = await supabase.from("documents").delete().eq("id", id);
 
     if (error) {

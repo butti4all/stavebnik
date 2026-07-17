@@ -1,4 +1,4 @@
-import { supabase } from "@/services/supabase/client";
+import { isSupabaseConfigured, supabase } from "@/services/supabase/client";
 import type { Supplier } from "@/types/entities";
 
 type SupplierRow = {
@@ -38,6 +38,10 @@ function toSupplierError(error: unknown, context: string): Error {
 
 export const SupplierRepository = {
   async getAll(): Promise<Supplier[]> {
+    if (!isSupabaseConfigured || !supabase) {
+      return [];
+    }
+
     const { data, error } = await supabase
       .from("suppliers")
       .select("id, name, company_id, email, phone, address, notes")
@@ -51,6 +55,10 @@ export const SupplierRepository = {
   },
 
   async getById(id: string): Promise<Supplier | null> {
+    if (!isSupabaseConfigured || !supabase) {
+      return null;
+    }
+
     const { data, error } = await supabase
       .from("suppliers")
       .select("id, name, company_id, email, phone, address, notes")
@@ -65,6 +73,10 @@ export const SupplierRepository = {
   },
 
   async create(supplier: Supplier): Promise<Supplier> {
+    if (!isSupabaseConfigured || !supabase) {
+      throw new Error("Supabase is not configured");
+    }
+
     const payload = {
       name: supplier.name,
       company_id: supplier.companyId ?? null,
@@ -88,6 +100,10 @@ export const SupplierRepository = {
   },
 
   async update(id: string, supplier: Supplier): Promise<Supplier> {
+    if (!isSupabaseConfigured || !supabase) {
+      throw new Error("Supabase is not configured");
+    }
+
     const payload = {
       name: supplier.name,
       company_id: supplier.companyId ?? null,
@@ -112,6 +128,10 @@ export const SupplierRepository = {
   },
 
   async remove(id: string): Promise<void> {
+    if (!isSupabaseConfigured || !supabase) {
+      throw new Error("Supabase is not configured");
+    }
+
     const { error } = await supabase.from("suppliers").delete().eq("id", id);
 
     if (error) {

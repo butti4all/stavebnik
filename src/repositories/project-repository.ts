@@ -1,4 +1,4 @@
-import { supabase } from "@/services/supabase/client";
+import { isSupabaseConfigured, supabase } from "@/services/supabase/client";
 import type { Project } from "@/types/entities";
 
 type ProjectRow = {
@@ -43,6 +43,10 @@ function toProjectError(error: unknown, context: string): Error {
 
 export const ProjectRepository = {
   async getAll(): Promise<Project[]> {
+    if (!isSupabaseConfigured || !supabase) {
+      return [];
+    }
+
     const { data, error } = await supabase
       .from("projects")
       .select("id, name, address, start_date, end_date, created_at, updated_at")
@@ -56,6 +60,10 @@ export const ProjectRepository = {
   },
 
   async getById(id: string): Promise<Project | null> {
+    if (!isSupabaseConfigured || !supabase) {
+      return null;
+    }
+
     const { data, error } = await supabase
       .from("projects")
       .select("id, name, address, start_date, end_date, created_at, updated_at")
@@ -70,6 +78,10 @@ export const ProjectRepository = {
   },
 
   async create(project: Project): Promise<Project> {
+    if (!isSupabaseConfigured || !supabase) {
+      throw new Error("Supabase is not configured");
+    }
+
     const payload = {
       name: project.name,
       address: project.address ?? null,

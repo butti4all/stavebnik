@@ -1,4 +1,4 @@
-import { supabase } from "@/services/supabase/client";
+import { isSupabaseConfigured, supabase } from "@/services/supabase/client";
 import type { WorkLog } from "@/types/entities";
 
 type WorkLogRow = {
@@ -40,6 +40,10 @@ function toWorkLogError(error: unknown, context: string): Error {
 
 export const WorkLogRepository = {
   async getAll(): Promise<WorkLog[]> {
+    if (!isSupabaseConfigured || !supabase) {
+      return [];
+    }
+
     const { data, error } = await supabase
       .from("work_logs")
       .select("id, project_id, worker_name, work_date, hours, hourly_rate, total_amount")
@@ -53,6 +57,10 @@ export const WorkLogRepository = {
   },
 
   async getByProjectId(projectId: string): Promise<WorkLog[]> {
+    if (!isSupabaseConfigured || !supabase) {
+      return [];
+    }
+
     const { data, error } = await supabase
       .from("work_logs")
       .select("id, project_id, worker_name, work_date, hours, hourly_rate, total_amount")
@@ -67,6 +75,10 @@ export const WorkLogRepository = {
   },
 
   async create(workLog: WorkLog): Promise<WorkLog> {
+    if (!isSupabaseConfigured || !supabase) {
+      throw new Error("Supabase is not configured");
+    }
+
     const payload = {
       project_id: workLog.projectId,
       worker_name: workLog.workerName,
@@ -89,6 +101,10 @@ export const WorkLogRepository = {
   },
 
   async update(id: string, workLog: WorkLog): Promise<WorkLog> {
+    if (!isSupabaseConfigured || !supabase) {
+      throw new Error("Supabase is not configured");
+    }
+
     const payload = {
       project_id: workLog.projectId,
       worker_name: workLog.workerName,
@@ -112,6 +128,10 @@ export const WorkLogRepository = {
   },
 
   async remove(id: string): Promise<void> {
+    if (!isSupabaseConfigured || !supabase) {
+      throw new Error("Supabase is not configured");
+    }
+
     const { error } = await supabase.from("work_logs").delete().eq("id", id);
 
     if (error) {
