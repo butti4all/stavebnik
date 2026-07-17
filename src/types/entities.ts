@@ -63,3 +63,35 @@ export type DiaryEntry = {
 
   longNote?: string;
 };
+
+export type DocumentItem = {
+  id: string;
+
+  projectId: string;
+
+  name: string;
+
+  documentType: string;
+
+  issueDate: string;
+
+  supplierId?: string;
+
+  notes?: string;
+};
+
+export type Supplier = {
+  id: string;
+
+  name: string;
+
+  companyId?: string;
+
+  email?: string;
+
+  phone?: string;
+
+  address?: string;
+
+  notes?: string;
+};
