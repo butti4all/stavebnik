@@ -3,6 +3,8 @@
 import { useMemo, useState } from "react";
 import { AppNavigation } from "@/components/app-navigation";
 import { useCreateSupplier, useSuppliers } from "@/hooks/use-suppliers";
+import { EmptyState } from "@/components/empty-state";
+import { ListSkeleton } from "@/components/loading-skeleton";
 import type { Supplier } from "@/types/entities";
 
 const initialForm: Omit<Supplier, "id"> = {
@@ -41,7 +43,7 @@ export default function SuppliersPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-950 px-4 py-10 text-slate-100 sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-slate-950 px-4 pb-24 py-10 text-slate-100 sm:px-6 lg:px-8 md:pb-10">
       <div className="mx-auto flex max-w-6xl flex-col gap-8">
         <AppNavigation />
 
@@ -64,11 +66,11 @@ export default function SuppliersPage() {
             </div>
 
             {isLoading ? (
-              <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-6 text-sm text-slate-400">Loading suppliers...</div>
+              <ListSkeleton count={4} />
             ) : isError ? (
               <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-6 text-sm text-rose-300">{error instanceof Error ? error.message : "Unable to load suppliers."}</div>
             ) : sortedSuppliers.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-slate-700 bg-slate-950/40 p-6 text-sm text-slate-400">No suppliers yet.</div>
+              <EmptyState title="No suppliers yet" description="Add your regular partners to keep quotes and contacts close at hand." />
             ) : (
               <div className="space-y-3">
                 {sortedSuppliers.map((supplier) => (

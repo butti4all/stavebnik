@@ -1,17 +1,19 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo } from "react";
 import { AppNavigation } from "@/components/app-navigation";
+import { PageSkeleton } from "@/components/loading-skeleton";
 import { useExpenses } from "@/hooks/use-expenses";
 import { useProjects } from "@/hooks/use-projects";
 import { useDiaryEntries } from "@/hooks/use-diary";
 import { useWorkLogs } from "@/hooks/use-worklogs";
 
 export default function DashboardPage() {
-  const { data: projects = [] } = useProjects();
-  const { data: expenses = [] } = useExpenses();
-  const { data: workLogs = [] } = useWorkLogs();
-  const { data: diaryEntries = [] } = useDiaryEntries();
+  const { data: projects = [], isLoading: projectsLoading } = useProjects();
+  const { data: expenses = [], isLoading: expensesLoading } = useExpenses();
+  const { data: workLogs = [], isLoading: workLoading } = useWorkLogs();
+  const { data: diaryEntries = [], isLoading: diaryLoading } = useDiaryEntries();
 
   const totalExpenses = useMemo(() => expenses.reduce((sum, item) => sum + item.amount, 0), [expenses]);
   const totalWorkCost = useMemo(() => workLogs.reduce((sum, item) => sum + item.totalAmount, 0), [workLogs]);
@@ -21,8 +23,12 @@ export default function DashboardPage() {
   const latestWorkLogs = useMemo(() => [...workLogs].slice(0, 4), [workLogs]);
   const latestDiaryEntries = useMemo(() => [...diaryEntries].slice(0, 4), [diaryEntries]);
 
+  if (projectsLoading || expensesLoading || workLoading || diaryLoading) {
+    return <PageSkeleton />;
+  }
+
   return (
-    <main className="min-h-screen bg-slate-950 px-4 py-10 text-slate-100 sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-slate-950 px-4 pb-24 py-10 text-slate-100 sm:px-6 lg:px-8 md:pb-10">
       <div className="mx-auto flex max-w-6xl flex-col gap-8">
         <AppNavigation />
 
@@ -52,6 +58,29 @@ export default function DashboardPage() {
             <p className="mt-2 text-3xl font-semibold">{totalCombinedCost.toFixed(2)} Kč</p>
           </div>
         </div>
+
+        <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-2xl shadow-slate-950/30">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-semibold">Quick actions</h2>
+              <p className="mt-1 text-sm text-slate-400">Jump straight into the next task.</p>
+            </div>
+          </div>
+          <div className="mt-4 grid gap-3 sm:grid-cols-3">
+            <Link href="/projects" className="rounded-xl border border-slate-800 bg-slate-950/70 p-3 text-sm text-slate-300 transition hover:border-sky-500/50">
+              <div className="font-semibold text-white">Projects</div>
+              <div className="mt-1 text-slate-400">Open the project list</div>
+            </Link>
+            <Link href="/expenses" className="rounded-xl border border-slate-800 bg-slate-950/70 p-3 text-sm text-slate-300 transition hover:border-sky-500/50">
+              <div className="font-semibold text-white">Expenses</div>
+              <div className="mt-1 text-slate-400">Track spend quickly</div>
+            </Link>
+            <Link href="/diary" className="rounded-xl border border-slate-800 bg-slate-950/70 p-3 text-sm text-slate-300 transition hover:border-sky-500/50">
+              <div className="font-semibold text-white">Diary</div>
+              <div className="mt-1 text-slate-400">Log today’s progress</div>
+            </Link>
+          </div>
+        </section>
 
         <div className="grid gap-8 lg:grid-cols-3">
           <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-2xl shadow-slate-950/30">
